@@ -1,0 +1,9 @@
+# Hyperparameter
+train_dataset: "train-clean-100"
+num_workers: 6
+batch_size: 4
+epochs: 8
+learning_rate: 0.0002  
+weight_decay: 0.005    
+cepstral_norm: true
+resume_training: true

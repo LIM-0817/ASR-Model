@@ -1,0 +1,8 @@
+.ipynb_checkpoints
+wandb
+attention_based_speech_recognition.ipynb
+data
+ASR_model.txt
+.vscode
+__pycache__
+MyModelCheckpoints

@@ -211,8 +211,8 @@ def main():
     # 5. Training
     ## 기본값 설정
     best_lev_dist = float("inf")
-    tf_rate = 1.0
-    tf_decay_factor = 0.9 # 매 epoch마다 얼마나 tf 값을 줄일지
+    tf_rate = config['tf_rate']
+    tf_decay_factor = config['tf_decay_factor'] # 매 epoch마다 얼마나 tf 값을 줄일지
     timer = TimeElapsed()
 
 

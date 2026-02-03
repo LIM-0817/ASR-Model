@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn 
+import math
 
 
 # Listener과 Speller 사이의 attention context 계산을 위한 Attention class
@@ -25,7 +26,8 @@ class Attention(torch.nn.Module):
         query = query.unsqueeze(1) # (batch, 1, dim)
 
         # 1. attention weight 계산 = k*q batch matmul & softmax
-        raw = torch.bmm(query, self.key.transpose(-1, -2))  # (batch, 1, seq)
+        dim = query.size(-1)
+        raw = torch.bmm(query, self.key.transpose(-1, -2)) / math.sqrt(dim) # (batch, 1, seq)
         raw = raw.squeeze(1) # (batch, seq)
         attention_weights = torch.nn.functional.softmax(raw, dim = -1)
 

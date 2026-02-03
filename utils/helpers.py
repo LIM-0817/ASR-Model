@@ -1,5 +1,6 @@
 import os
 import matplotlib.pyplot as plt
+plt.use('Agg') # GUI 창을 띄우지 않고 파일로만 저장하는 설정
 import seaborn as sns
 import time
 

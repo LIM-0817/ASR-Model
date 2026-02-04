@@ -6,3 +6,4 @@ ASR_model.txt
 .vscode
 __pycache__
 MyModelCheckpoints
+attention_plot

@@ -230,6 +230,25 @@ def main():
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
 
+        # 학습률 강제 변경
+        lr_input = config['learning_rate']
+        current_lr = optimizer.param_groups[0]['lr']
+        
+        ## config.yaml의 lr과 현재 optimizer에 저장된 lr이 다르다면 config.yaml의 lr로 update
+        if lr_input != current_lr:
+            print(f'learning rate를 변경합니다.: {current_lr} -> {lr_input}')
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = lr_input
+
+        ## scheduler에 기억되어있는 값들 변경
+        ## 새 학습률로 미세 조정을 시작하므로, 기억하고 있는 valid dist와 patience 초기화 
+        scheduler.best = float('inf')
+        scheduler.num_bad_epochs = 0
+        
+        # 스케줄러가 마지막으로 인지한 학습률도 업데이트
+        if hasattr(scheduler, '_last_lr'):
+            scheduler._last_lr = [lr_input]
+
         # best_lev_dist 불러오기
         ## best_lev_dist가 있다면 해당 값을, 없다면 양의 무한대를 불러옴.
         best_lev_dist = checkpoint.get('best_lev_dist', float('inf'))

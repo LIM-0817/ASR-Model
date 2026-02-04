@@ -1,12 +1,12 @@
 # Hyperparameter
 train_dataset: "train-clean-100"
 num_workers: 6
-batch_size: 4
+batch_size: 8
 cepstral_norm: true
-resume_training: true
+resume_training: false
 
-epochs: 8
-learning_rate: 0.001 
-weight_decay: 0.005  
+epochs: 40
+learning_rate: 0.0005
+weight_decay: 0.001
 tf_rate: 0.9
-tf_decay_factor: 1.0
+tf_decay_factor: 0.98

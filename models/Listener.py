@@ -12,26 +12,34 @@ from config import DEVICE
 class TransformerListener(torch.nn.Module):
     def __init__(self,
                 input_size,
-                base_lstm_layers        = 1,
-                pblstm_layers           = 1,
-                listener_hidden_size    = 64,
-                n_heads                 = 8,
-                tf_blocks               = 1):
+                base_lstm_layers = 1,
+                listener_hidden_size = 64,
+                n_heads = 8,
+            ):
         super().__init__()
 
-        # LSTM layer
+        # LSTM layer 1 - for pblstm
         self.base_lstm = nn.LSTM(
                 input_size, 
                 listener_hidden_size, 
                 base_lstm_layers, 
                 batch_first = True, 
-                bidirectional = True
-            )   # 결과 dim = listener_hidden_Size*2
+                bidirectional = True    # 결과 dim = listener_hidden_Size*2
+            )   
+        
+        # LSTM layer 2 - for pblstm
+        self.top_lstm = nn.LSTM(
+                listener_hidden_size*4,
+                listener_hidden_size,
+                1,
+                batch_first = True,
+                bidirectional = True,
+            )       
         
         # 1D CNN layer 생성(시간 순의 MFCC의 지역적 특징을 뽑아내기 위해 1d CNN이용)
             ## kernel size를 3로, padding = 1
             ## inputsize - kernelsize + 2*padding을 통해 output_size도 input_size로 맞춤
-        self.embedding = nn.Conv1d(listener_hidden_size*2, listener_hidden_size*2, kernel_size = 3, stride = 1, padding = 1) 
+        self.embedding = nn.Conv1d(listener_hidden_size*2, listener_hidden_size*2, kernel_size = 3, stride = 2, padding = 1) 
 
         # Positional Encoding
         self.positional_encoding = PositionalEncoding(listener_hidden_size*2)
@@ -61,28 +69,53 @@ class TransformerListener(torch.nn.Module):
         output_lengths = output_lengths.to(x.device) # 결과 길이는 다시 gpu에 올리기
         
         # 5. 언패킹 이후 원래 배치 순서대로 텐서를 복구(나중에 Label과의 짝 맞춰야하므로 꼭 필요함.)
-        _, unsorted_indices = torch.sort(sorted_indices)
-        output = output[unsorted_indices]
+        _, unsorted_indices = torch.sort(sorted_indices)    # sorted indices를 정렬하여 해당 순서대로 배열하면 
+        output = output[unsorted_indices]                   # 다시 원래대로 돌아옴.(0, 1, 2... 순으로 배열되므로)
         output_lengths = output_lengths[unsorted_indices]
+
+        # 6. pblstm -> 현재 seq를 반으로 줄여서 다음 lstm에 넣어줘야함.
+        ## 1) output의 seq가 짝수인 경우 pad를 1개 줄이기
+        if output.size(1) % 2 == 1:
+            output = output[:, :-1, :]
+
+        ## 2) output의 seq길이 1/2배
+        b, s, d = output.size()
+        input_2nd = output.contiguous().view([b, s//2, d*2])
+        output_lengths = output_lengths // 2
+
+        ## 3) lstm에 다시 넣어줌.
+        input_2nd_packed = torch.nn.utils.rnn.pack_padded_sequence(
+                input_2nd, 
+                output_lengths.cpu(), 
+                batch_first=True, 
+                enforce_sorted=False
+                )
         
-        # 6. 1d CNN 통과
+        lstm2_out_packed, _ = self.top_lstm(input_2nd_packed)
+        lstm2_out, _ = torch.nn.utils.rnn.pad_packed_sequence(lstm2_out_packed, batch_first=True)
+
+        # 7. 1d CNN 통과
             ## Conv1d에 넣을 때 (batch, dim, seq) 순서로. 따라서 transpose 후 다시 원래대로 돌림.
-        output = self.embedding(output.transpose(-1, -2))   #, Conv1d에 넣을 때 (batch, dim, seq 순서로 넣음)
-        output = output.transpose(-1, -2) # (batch, seq, dim)
+        output_emb = self.embedding(lstm2_out.transpose(-1, -2))   #, Conv1d에 넣을 때 (batch, dim, seq 순서로 넣음)
+        output_emb = output_emb.transpose(-1, -2) # (batch, seq, dim)
+
+        ## CNN에 stride와 pad를 넣었으니 output_lengths 보정 필요
+        ## 실제 공식: L_out = (L_in + 2*pad - kernel)/stride + 1
+        output_lengths = torch.clamp(output_lengths//2, max=output_emb.size(1))
         
-        # 7. Transformer용 패딩 마스크 생성
+        # 8. Transformer용 패딩 마스크 생성
             ## 실제 값이 아닌 패딩 부분은 True인 mask를 생성
             ## output_lengths는 1차원 텐서(batch,)로, 각 배치마다의 문장 길이를 담고 있음. 
             ## torch.arange(max_len).unsqueeze(0)는 (1, seq), output_lengths.unsqueeze(1)은 (batch, 1)
             ## 각각이 (batch, seq)으로 맞춰져서 broadcasting으로 비교
-        max_len = output.shape[1]
+        max_len = output_emb.shape[1]
         mask = (torch.arange(max_len, device=x.device).unsqueeze(0) >= output_lengths.unsqueeze(1)) 
         
-        # 8. Transformer에 넣기 전 positional encoding 
-        output  = self.positional_encoding(output) 
+        # 9. Transformer에 넣기 전 positional encoding 
+        output_pos  = self.positional_encoding(output_emb) 
 
-        # 9. Transformer에 통과
+        # 10. Transformer에 통과
             ## mask를 넣어서 패딩은 연산에서 제외하도록 함. 
-        output = self.transformer_encoder(output, src_key_padding_mask = mask)
+        output_fin = self.transformer_encoder(output_pos, src_key_padding_mask = mask)
 
-        return output, output_lengths
+        return output_fin, output_lengths

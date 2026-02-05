@@ -192,7 +192,7 @@ def main():
     wandb.login()
 
     ## project 이름과 run의 이름을 지정
-    wandb.init(project = 'attention-based-speech-recognition-Lim', name = '1st') 
+    wandb.init(project = 'attention-based-speech-recognition-Lim', name = config['project_name']) 
 
     ## model = ASRmodel을 ASR_model.txt에 저장
     with open("ASR_model.txt", "w") as f:

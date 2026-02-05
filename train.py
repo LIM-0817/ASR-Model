@@ -304,7 +304,7 @@ def main():
         }, step=epoch)
 
         ### 6) scheduler로 lr 조절
-        if scheduler:
+        if scheduler and epoch >= 20:
             scheduler.step(valid_dist) 
 
         ### 7) tf rate 낮추기

@@ -35,4 +35,12 @@ class Attention(torch.nn.Module):
         attention_context = torch.bmm(attention_weights.unsqueeze(1), self.value).squeeze(1)
         attention_context.squeeze(1)
         
+        if torch.isnan(attention_weights).any():
+            print("NaN in attention_weights")
+
+        # 분포 체크
+        print("attn max:", attention_weights.max().item(),
+            "min:", attention_weights.min().item(),
+            "mean:", attention_weights.mean().item())
+
         return attention_context, attention_weights

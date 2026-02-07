@@ -20,5 +20,5 @@ tf_decay_factor_1: 0.99  # stage1(epoch 40이하, alignment 유도 지점)
 tf_decay_factor_2: 0.995 # stage2(epoch 40이상, 자립 단계
 
 
-project_name: "tf_ratio tuning + data_augmentation"
-resume_training: true
+project_name: "add masking in attender"
+resume_training: false

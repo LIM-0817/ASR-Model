@@ -212,7 +212,8 @@ def main():
     ## 기본값 설정
     best_lev_dist = float("inf")
     tf_rate = config['tf_rate']
-    tf_decay_factor = config['tf_decay_factor'] # 매 epoch마다 얼마나 tf 값을 줄일지
+    tf_decay_factor_1 = config['tf_decay_factor_1'] # 매 epoch마다 얼마나 tf 값을 줄일지
+    tf_decay_factor_2 = config['tf_decay_factor_2']
     timer = TimeElapsed()
 
 
@@ -308,14 +309,19 @@ def main():
             scheduler.step(valid_dist) 
 
         ### 7) tf rate 낮추기
-        tf_rate *= tf_decay_factor
-        tf_rate = max(tf_rate, 0.6) # tf_rate 값 제한(0.6)
+        if epoch < 40 : 
+            tf_rate *= tf_decay_factor_1
+            tf_rate = max(tf_rate, 0.6) # tf_rate 값 제한(0.6)
+        else:
+            tf_rate *= tf_decay_factor_2
+            tf_rate = max(tf_rate, 0.1)
 
         ### 8) Levenshtein Distance가 낮게 나왔으면 best_model.pth 갱신
         if valid_dist < best_lev_dist: 
             print(f"New best model found! Levenshtein distance improved from {best_lev_dist:.4f} to {valid_dist:.4f}")
             best_lev_dist = valid_dist
-            # Save your model checkpoint here
+
+            # best model 저장
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),

@@ -39,8 +39,12 @@ class Attention(torch.nn.Module):
             ### expand로 [0, 1, 2, ... , max_len - 1]의 행렬을 len(encoder_len) = batch만큼 늘려 (batch, max_len)행렬을 만듦
         ## encoder_len = (batch, ) 이므로 unsqueeze(1)로 (batch, 1)로 바꿔서
         ## broadcasting을 통해 mask 생성
-        mask = torch.arange(max_len).expand(len(encoder_len), max_len) >= encoder_len.unsqueeze(1)
-        raw = raw.masked_fill_(mask, -1e9)  # 작은 수 써서 softmax 시 0이 됨.
+        mask = torch.arange(max_len, device=self.key.device).expand(len(encoder_len), max_len) >= encoder_len.unsqueeze(1)
+        
+        ## autocast를 사용하고 있는데 ,-1e9는 float16으로는 표현 불가
+        ## torch.finfo(raw.dtype).min을 쓰면 type에 맞는 가장 작은 수가 할당됨
+        small_num = torch.finfo(raw.dtype).min
+        raw = raw.masked_fill_(mask, small_num)  # 작은 수 써서 softmax 시 0이 됨.
 
         attention_weights = torch.nn.functional.softmax(raw, dim = -1)
 

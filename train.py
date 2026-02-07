@@ -57,14 +57,15 @@ def train(model, dataloader, criterion, optimizer, teacher_forcing_ratio, epoch)
     data_augmentation = config["data_augmentation"]
     Time_mask = T.TimeMasking(config["time_masking"]).to(DEVICE)       
     Freq_mask = T.FrequencyMasking(config["freq_masking"]).to(DEVICE)  
-    starting_epoch = config["starting_epoch"]
+    starting_epoch = config["starting_epoch"] - 1
+
+    if epoch == starting_epoch:
+        print(f"현재 epoch부터 Data Augmentation을 적용해 훈련을 진행합니다.")
 
     for i, (x, y, lx, ly) in enumerate(dataloader):
 
         # SpecAugmentation = Timemasking, Frequencymasking모두 적용
         if data_augmentation and (epoch >= starting_epoch):
-            if epoch == starting_epoch:
-                print(f"현재 epoch부터 Data Augmentation을 적용해 훈련을 진행합니다.")
             x = x.transpose(1, 2)   # torchaudio.transform의 input은 (b, freq, time)을 기대하므로 transpose
             x = Time_mask(x)
             x = Freq_mask(x)

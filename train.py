@@ -2,6 +2,7 @@ import os
 import gc
 import torch
 import torch.nn as nn
+import torchaudio.transforms as T 
 from tqdm import tqdm as blue_tqdm
 from torch.amp import GradScaler, autocast
 import wandb
@@ -44,7 +45,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
 
 
 # 3. train함수 정의
-def train(model, dataloader, criterion, optimizer, teacher_forcing_ratio):
+def train(model, dataloader, criterion, optimizer, teacher_forcing_ratio, epoch):
 
     model.train()
     batch_bar = blue_tqdm(total=len(dataloader), dynamic_ncols=True, leave=False, position=0, desc='Train')
@@ -52,7 +53,23 @@ def train(model, dataloader, criterion, optimizer, teacher_forcing_ratio):
     running_loss        = 0.0
     running_perplexity  = 0.0
 
+    # SpecAugmentation
+    data_augmentation = config["data_augmentation"]
+    Time_mask = T.TimeMasking(config["time_masking"]).to(DEVICE)       
+    Freq_mask = T.FrequencyMasking(config["freq_masking"]).to(DEVICE)  
+    starting_epoch = config["starting_epoch"] - 1
+
+    if epoch == starting_epoch:
+        print(f"현재 epoch부터 Data Augmentation을 적용해 훈련을 진행합니다.")
+
     for i, (x, y, lx, ly) in enumerate(dataloader):
+
+        # SpecAugmentation = Timemasking, Frequencymasking모두 적용
+        if data_augmentation and (epoch >= starting_epoch):
+            x = x.transpose(1, 2)   # torchaudio.transform의 input은 (b, freq, time)을 기대하므로 transpose
+            x = Time_mask(x)
+            x = Freq_mask(x)
+            x = x.transpose(1, 2)   # 복구
 
         optimizer.zero_grad()
 
@@ -274,6 +291,7 @@ def main():
             criterion,
             optimizer,
             teacher_forcing_ratio = tf_rate,
+            epoch=epoch
         )
         
         ### 2) validate 함수 실행

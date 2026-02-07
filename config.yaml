@@ -1,10 +1,17 @@
 # Hyperparameter
+## data
 train_dataset: "train-clean-100"
 num_workers: 6
 batch_size: 32
 cepstral_norm: true
-resume_training: true
 
+## data_augmentation
+data_augmentation: true
+starting_epoch: 60
+time_masking: 30
+freq_masking: 15
+
+## training
 epochs: 100
 learning_rate: 0.0005
 weight_decay: 0.0001  # 과적합 방지
@@ -12,4 +19,6 @@ tf_rate: 0.9
 tf_decay_factor_1: 0.99  # stage1(epoch 40이하, alignment 유도 지점)
 tf_decay_factor_2: 0.995 # stage2(epoch 40이상, 자립 단계
 
+
 project_name: "tf_ratio tuning"
+resume_training: false

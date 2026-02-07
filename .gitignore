@@ -7,3 +7,6 @@ ASR_model.txt
 __pycache__
 MyModelCheckpoints
 attention_plot
+LIM_ASR_Architecture_Graph
+requirements.txt
+LIM_ASR_Architecture_Graph.png

@@ -73,7 +73,7 @@ class Speller(torch.nn.Module):
         
         return out
 
-    def forward (self, encoder_output,  y=None, teacher_forcing_ratio=1): # y = groundtruth를 의미
+    def forward(self, encoder_output, encoder_len, y=None, teacher_forcing_ratio=1): # y = groundtruth를 의미
         raw_outputs = []        # 결과로 나온 logit (vocab_size,)
         attention_plot = []     # attention weight plotting을 위해 모아 놓을 리스트
 
@@ -122,7 +122,7 @@ class Speller(torch.nn.Module):
 
             # 5) 가장 마지막 layer의 hidden state를 이용해서 attention context를 계산
                 ## attender의 key and value는 ASR model에서 계산될 것
-            attn_context, attn_weights = self.attend.compute_context(hidden_states_list[self.lstm_step_count-1][0]) 
+            attn_context, attn_weights = self.attend.compute_context(hidden_states_list[self.lstm_step_count-1][0], encoder_len) 
 
             # 6) CDN 층에 통과
                 ## cdn에 들어갈 input = 이전 layer의 hidden state 및 이를 이용해서 새로 계산한 attention context를 concat

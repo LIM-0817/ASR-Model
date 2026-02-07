@@ -103,7 +103,7 @@ class TransformerListener(torch.nn.Module):
         ## 실제 공식: L_out = (L_in + 2*pad - kernel)/stride + 1
         output_lengths = torch.clamp(output_lengths//2, max=output_emb.size(1))
         
-        # 8. Transformer용 패딩 마스크 생성
+        # 8. encoder용 패딩 마스크 생성
             ## 실제 값이 아닌 패딩 부분은 True인 mask를 생성
             ## output_lengths는 1차원 텐서(batch,)로, 각 배치마다의 문장 길이를 담고 있음. 
             ## torch.arange(max_len).unsqueeze(0)는 (1, seq), output_lengths.unsqueeze(1)은 (batch, 1)
@@ -111,10 +111,10 @@ class TransformerListener(torch.nn.Module):
         max_len = output_emb.shape[1]
         mask = (torch.arange(max_len, device=x.device).unsqueeze(0) >= output_lengths.unsqueeze(1)) 
         
-        # 9. Transformer에 넣기 전 positional encoding 
+        # 9. encoder에 넣기 전 positional encoding 
         output_pos  = self.positional_encoding(output_emb) 
 
-        # 10. Transformer에 통과
+        # 10. encoder에 통과
             ## mask를 넣어서 패딩은 연산에서 제외하도록 함. 
         output_fin = self.transformer_encoder(output_pos, src_key_padding_mask = mask)
 

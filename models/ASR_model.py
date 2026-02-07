@@ -16,13 +16,13 @@ class ASRModel(torch.nn.Module):
 
     def forward(self, x,lx,y=None,teacher_forcing_ratio=1):
         # 1. Listener을 이용해 speech data Encoding 
-        encoder_outputs, _ = self.listener(x,lx)
+        encoder_outputs, encoder_len = self.listener(x,lx)
 
         # 2. Decoding step을 위해서 key,value 값 계산
             ## encoder의 key, value는 변하지 않는 값이므로 미리 이렇게 계산하는 것.
         self.attender.set_key_value(encoder_outputs)   
 
         # 3. attention을 이용한 decoding step
-        raw_outputs, attention_plots = self.speller(encoder_output = encoder_outputs, y=y,teacher_forcing_ratio=teacher_forcing_ratio)
+        raw_outputs, attention_plots = self.speller(encoder_output = encoder_outputs, encoder_len = encoder_len, y=y,teacher_forcing_ratio=teacher_forcing_ratio)
 
         return raw_outputs, attention_plots

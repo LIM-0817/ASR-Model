@@ -16,7 +16,7 @@ class Attention(torch.nn.Module):
 
     # set_key_value 함수 실행 시 key, value값 계산
     def set_key_value(self, encoder_outputs):   
-        self.key = self.KW(encoder_outputs)     # (batch, max_len, )
+        self.key = self.KW(encoder_outputs)     # (batch, max_len, dim)
         self.value = self.VW(encoder_outputs) 
 
     # attention context 계산 함수

@@ -27,7 +27,16 @@ class TransformerListener(torch.nn.Module):
                 bidirectional = True    # 결과 dim = listener_hidden_Size*2
             )   
         
-        # LSTM layer 2 - for pblstm
+        # LSTM layer 2 - for pblstm 
+        self.middle_lstm = nn.LSTM(
+                listener_hidden_size*4, # base_lstm의 결과 
+                listener_hidden_size,
+                1, 
+                batch_first = True,
+                bidirectional = True,
+            )
+
+        # LSTM layer 3 - for pblstm
         self.top_lstm = nn.LSTM(
                 listener_hidden_size*4,
                 listener_hidden_size,
@@ -73,28 +82,50 @@ class TransformerListener(torch.nn.Module):
         output = output[unsorted_indices]                   # 다시 원래대로 돌아옴.(0, 1, 2... 순으로 배열되므로)
         output_lengths = output_lengths[unsorted_indices]
 
-        # 6. pblstm -> 현재 seq를 반으로 줄여서 다음 lstm에 넣어줘야함.
+        # 6. pblstm (first stage - base_lstm output to middle_lstm input)
         ## 1) output의 seq가 짝수인 경우 pad를 1개 줄이기
         if output.size(1) % 2 == 1:
             output = output[:, :-1, :]
 
-        ## 2) output의 seq길이 1/2배
+        ## 2) output의 seq길이 1/2배, dim 2배
         b, s, d = output.size()
-        input_2nd = output.contiguous().view([b, s//2, d*2])
+        input_to_middle = output.contiguous().view([b, s//2, d*2])
         output_lengths = output_lengths // 2
 
-        ## 3) lstm에 다시 넣어줌.
-        input_2nd_packed = torch.nn.utils.rnn.pack_padded_sequence(
-                input_2nd, 
-                output_lengths.cpu(), 
-                batch_first=True, 
+        ## 3) middle_lstm에 넣어줌.
+        input_to_middle_packed = torch.nn.utils.rnn.pack_padded_sequence(
+                input_to_middle,
+                output_lengths.cpu(),
+                batch_first=True,
                 enforce_sorted=False
                 )
-        
-        lstm2_out_packed, _ = self.top_lstm(input_2nd_packed)
-        lstm2_out, _ = torch.nn.utils.rnn.pad_packed_sequence(lstm2_out_packed, batch_first=True)
 
-        # 7. 1d CNN 통과
+        middle_lstm_out_packed, _ = self.middle_lstm(input_to_middle_packed)
+        middle_lstm_out, middle_lstm_out_lengths = torch.nn.utils.rnn.pad_packed_sequence(middle_lstm_out_packed, batch_first=True)
+        output_lengths = middle_lstm_out_lengths.to(x.device)
+
+        # 7. pblstm (2nd stage - middle_lstm output to top_lstm input)
+        ## 1) output의 seq가 짝수인 경우 pad를 1개 줄이기
+        if middle_lstm_out.size(1) % 2 == 1:
+            middle_lstm_out = middle_lstm_out[:, :-1, :]
+
+        ## 2) output의 seq길이 1/2배, dim 2배
+        b, s, d = middle_lstm_out.size()
+        input_to_top = middle_lstm_out.contiguous().view([b, s//2, d*2])
+        output_lengths = output_lengths // 2 # halve again
+
+        ## 3) top_lstm에 다시 넣어줌.
+        input_to_top_packed = torch.nn.utils.rnn.pack_padded_sequence(
+                input_to_top,
+                output_lengths.cpu(),
+                batch_first=True,
+                enforce_sorted=False
+                )
+
+        lstm2_out_packed, _ = self.top_lstm(input_to_top_packed)
+        lstm2_out, _ = torch.nn.utils.rnn.pad_packed_sequence(lstm2_out_packed, batch_first=True)
+        
+        # 8. 1d CNN 통과
             ## Conv1d에 넣을 때 (batch, dim, seq) 순서로. 따라서 transpose 후 다시 원래대로 돌림.
         output_emb = self.embedding(lstm2_out.transpose(-1, -2))   #, Conv1d에 넣을 때 (batch, dim, seq 순서로 넣음)
         output_emb = output_emb.transpose(-1, -2) # (batch, seq, dim)
@@ -103,7 +134,7 @@ class TransformerListener(torch.nn.Module):
         ## 실제 공식: L_out = (L_in + 2*pad - kernel)/stride + 1
         output_lengths = torch.clamp(output_lengths//2, max=output_emb.size(1))
         
-        # 8. encoder용 패딩 마스크 생성
+        # 9. encoder용 패딩 마스크 생성
             ## 실제 값이 아닌 패딩 부분은 True인 mask를 생성
             ## output_lengths는 1차원 텐서(batch,)로, 각 배치마다의 문장 길이를 담고 있음. 
             ## torch.arange(max_len).unsqueeze(0)는 (1, seq), output_lengths.unsqueeze(1)은 (batch, 1)
@@ -111,10 +142,10 @@ class TransformerListener(torch.nn.Module):
         max_len = output_emb.shape[1]
         mask = (torch.arange(max_len, device=x.device).unsqueeze(0) >= output_lengths.unsqueeze(1)) 
         
-        # 9. encoder에 넣기 전 positional encoding 
+        # 10. encoder에 넣기 전 positional encoding 
         output_pos  = self.positional_encoding(output_emb) 
 
-        # 10. encoder에 통과
+        # 11. encoder에 통과
             ## mask를 넣어서 패딩은 연산에서 제외하도록 함. 
         output_fin = self.transformer_encoder(output_pos, src_key_padding_mask = mask)
 

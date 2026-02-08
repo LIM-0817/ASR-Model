@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from .layers import PositionalEncoding
 from .layers import TransformerEncoder
-from config import DEVICE
+from config import DEVICE, config
 
 
 # TransformerListner class
@@ -13,7 +13,7 @@ class TransformerListener(torch.nn.Module):
     def __init__(self,
                 input_size,
                 base_lstm_layers = 1,
-                listener_hidden_size = 64,
+                listener_hidden_size = config["listener_hidden_size"],
                 n_heads = 8,
             ):
         super().__init__()

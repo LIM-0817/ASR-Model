@@ -6,12 +6,18 @@ from models import TransformerListener, Attention, Speller
 
 # 정의한 Listener, Attender, Speller을 조립하여 ASR model 정의
 class ASRModel(torch.nn.Module):
-    def __init__(self, batch_size, input_size, embed_dim, lstm_step): # embed_dim = listener_hidden_size*2
+    def __init__(self,
+                listener_hidden_size, 
+                batch_size, 
+                input_size, 
+                embed_dim, 
+                lstm_step
+                ): # embed_dim = listener_hidden_size*2
         super().__init__()
 
         # listener, attender, speller 정의
         self.listener = TransformerListener(input_size = input_size)
-        self.attender = Attention(embed_dim, embed_dim, embed_dim)
+        self.attender = Attention(listener_hidden_size*2, embed_dim, embed_dim)
         self.speller = Speller(batch_size, self.attender, embed_dim, lstm_step)
 
     def forward(self, x,lx,y=None,teacher_forcing_ratio=1):

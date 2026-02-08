@@ -15,7 +15,7 @@ from dataset import SpeechDatasetME
 
 
 # 1. model 정의(ASR model)
-model = ASRModel(batch_size = config['batch_size'], input_size = 28, embed_dim =128,  lstm_step = 2)
+model = ASRModel(listener_hidden_size=config["listener_hidden_size"], batch_size = config['batch_size'], input_size = 28, embed_dim = config["embed_dim"],  lstm_step = 2)
 model = model.to(DEVICE)
 
 
@@ -329,10 +329,10 @@ def main():
         ### 7) tf rate 낮추기
         if epoch < 40 : 
             tf_rate *= tf_decay_factor_1
-            tf_rate = max(tf_rate, 0.6) # tf_rate 값 제한(0.6)
+            tf_rate = max(tf_rate, 0.7) # tf_rate 값 제한
         else:
             tf_rate *= tf_decay_factor_2
-            tf_rate = max(tf_rate, 0.1)
+            tf_rate = max(tf_rate, 0.5)
 
         ### 8) Levenshtein Distance가 낮게 나왔으면 best_model.pth 갱신
         if valid_dist < best_lev_dist: 

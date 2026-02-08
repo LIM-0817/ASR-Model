@@ -11,14 +11,18 @@ starting_epoch: 60
 time_masking: 30
 freq_masking: 15
 
+## model
+listener_hidden_size: 128
+embed_dim: 128
+
 ## training
 epochs: 100
 learning_rate: 0.0005
 weight_decay: 0.0001  # 과적합 방지
-tf_rate: 0.9
+tf_rate: 1.0
 tf_decay_factor_1: 0.99  # stage1(epoch 40이하, alignment 유도 지점)
-tf_decay_factor_2: 0.995 # stage2(epoch 40이상, 자립 단계
+tf_decay_factor_2: 0.98 # stage2(epoch 40이상, 자립 단계)
 
 
-project_name: "add masking in attender"
+project_name: "modify embed_dim"
 resume_training: false

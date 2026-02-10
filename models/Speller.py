@@ -158,8 +158,10 @@ class Speller(torch.nn.Module):
             ## - repeat() -> [A, B, A, B, A, B] = 통째로 반복
             ## - repeat() -> [A, A, A, B, B, B] = 제자리 반복
             ## 같은 배치 내의 데이터는 연속적으로 topk 개수 만큼 있어야 다루기 편하므로, repeat_interleave를 이용함.
-        encoder_output = encoder_output.repeat_interleave(topk, dim=0)  # (b*k, seq, dim)
-        encoder_len = encoder_len.repeat_interleave(topk, dim=0)        # (b*k, )
+        
+        ## test.py에 보면 encoder_output과 encoder_len은 이미 슈퍼배치가 되서 들어오고 있음.
+        encoder_output = encoder_output  # (b*k, seq, dim)
+        encoder_len = encoder_len        # (b*k, )
 
         # 2. lstm_step 개수 만큼 hidden state list에 hidden state을 초기화
         hidden_states_list = [] 

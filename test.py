@@ -52,7 +52,7 @@ def test(model, dataloader):
         x, lx = x.to(DEVICE), lx.to(DEVICE)
 
         with torch.inference_mode():
-            predictions, _ = model(x, lx, y = None, decode_mode=config["decode_mode"])
+            predictions, _ = model(x, lx, y = None)
 
         # 2. Greedy Decoding
         if model.decode_mode == "greedy":

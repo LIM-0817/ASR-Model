@@ -218,7 +218,7 @@ class Speller(torch.nn.Module):
 
             ## log_prob의 flat_mask부분은 모두 -1e9로 채우고, <eos>만 0으로 만들어 선택하도록 함.
             log_prob = log_prob.masked_fill(flat_mask_expand, -1e9)    
-            log_prob[:, :, VOCAB_MAP['<eos>']] = log_prob[:, :, VOCAB_MAP['<eos>']].masked_fill(flat_mask, 0.0)
+            log_prob[:, :, VOCAB_MAP['<eos>']] = log_prob[:, :, VOCAB_MAP['<eos>']].masked_fill(finished, 0.0)
 
             # 7) beam score = 모든 확률의 곱(여기서는 log이므로 합으로 구함)
             updated_score = beam_score.unsqueeze(-1) + log_prob.view(batch, topk, -1) # (b, k, vocab_size = 31)

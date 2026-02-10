@@ -15,7 +15,15 @@ from dataset import SpeechDatasetME
 
 
 # 1. model 정의(ASR model)
-model = ASRModel(listener_hidden_size=config["listener_hidden_size"], batch_size = config['batch_size'], input_size = 28, embed_dim = config["embed_dim"],  lstm_step = 2)
+model = ASRModel(
+    listener_hidden_size=config["listener_hidden_size"], 
+    batch_size = config['batch_size'], 
+    input_size = 28, 
+    embed_dim = config["embed_dim"],  
+    lstm_step = 2,
+    decode_mode='greedy'
+    )
+
 model = model.to(DEVICE)
 
 
@@ -77,7 +85,11 @@ def train(model, dataloader, criterion, optimizer, teacher_forcing_ratio, epoch)
 
         with autocast(device_type=DEVICE): # autocast 실행 상태에서 loss 계산
 
-            raw_predictions, attention_plot = model(x, lx, y= y, teacher_forcing_ratio = teacher_forcing_ratio)
+            raw_predictions, attention_plot = model(
+                x, lx, y= y, 
+                teacher_forcing_ratio = teacher_forcing_ratio, 
+                )
+            
             # nn.CrossEntropyLoss의 입력조건은 (N, C), (N,)임
             # 따라서 (batch_size, timesteps, vocab_size), (batch_size, timesteps)인 애들의 shape을 바꿔줘야 함.
             loss = criterion(raw_predictions[:, :-1, :].reshape(-1, raw_predictions.size(-1)), y[:, 1:].reshape(-1))
@@ -136,7 +148,7 @@ def validate(model, dataloader):
                 raw_predictions, attentions = model(x, lx, y=None)
 
             # Greedy Decoding
-            greedy_predictions   = torch.argmax(raw_predictions, dim = -1) # How do you get the most likely character from each distribution in the batch?
+            greedy_predictions   = torch.argmax(raw_predictions, dim = -1) 
     
             # Levenshtein Distance 계산
             running_lev_dist    += calc_edit_distance(greedy_predictions, y, ly, VOCAB, print_example = False) # You can use print_example = True for one specific index i in your batches if you want
@@ -191,7 +203,7 @@ def main():
         num_workers = config['num_workers'],
         pin_memory  = True,
         collate_fn  = train_dataset.collate_fn, #이런 식으로 dataset에서 collate_fn을 정의한 뒤 train_loader에서 collate_fn을 불러옴.
-        drop_last = True
+        drop_last   = True
     )
 
     valid_loader    = torch.utils.data.DataLoader(
@@ -201,7 +213,7 @@ def main():
         num_workers = config['num_workers'],
         pin_memory  = True,
         collate_fn  = valid_dataset.collate_fn,
-        drop_last = True
+        drop_last   = True
     )
 
     

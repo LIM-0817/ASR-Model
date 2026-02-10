@@ -31,7 +31,15 @@ test_loader     = torch.utils.data.DataLoader(
 )
 
 # 1. model 정의(ASR model)
-model = ASRModel(listener_hidden_size=config["listener_hidden_size"], batch_size = config['batch_size'], input_size = 28, embed_dim =config["embed_dim"],  lstm_step = 2)
+model = ASRModel(
+    listener_hidden_size=config["listener_hidden_size"], 
+    batch_size = config['batch_size'], 
+    input_size = 28, 
+    embed_dim = config["embed_dim"],  
+    lstm_step = 2,
+    decode_mode = config["decode_mode"]
+    )
+
 model = model.to(DEVICE)
 
 def test(model, dataloader):
@@ -44,14 +52,21 @@ def test(model, dataloader):
         x, lx = x.to(DEVICE), lx.to(DEVICE)
 
         with torch.inference_mode():
-            raw_predictions, _ = model(x, lx, y = None)
+            output, _ = model(x, lx, y = None)
 
-        # Greedy Decoding
-        greedy_predictions = torch.argmax(raw_predictions, dim = -1)
+        # 2. Greedy Decoding
+        if model.decode_mode == "greedy":
+            greedy_predictions = torch.argmax(output, dim = -1)
 
-        # Convert predictions to characters
-        for pred in greedy_predictions:
-            predictions.append("".join(indices_to_chars(pred, VOCAB)))
+        ## Convert predictions to characters
+            for pred in greedy_predictions:
+                predictions.append("".join(indices_to_chars(pred, VOCAB)))
+        
+        # 1. beam search
+        ## beam search는 변환없이 바로 indices_to_chars 적용
+        if model.decode_mode == "beam":
+            for pred in output:
+                    predictions.append("".join(indices_to_chars(pred, VOCAB)))
 
         batch_bar.update()
 

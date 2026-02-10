@@ -38,8 +38,8 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer,
     mode="min",        # loss 감소를 모니터링할 때
     factor=0.5,        # lr을 절반으로 줄임
-    patience=3,        # 3 epoch 동안 개선 없으면 감소
-    threshold=1e-3,    # 개선으로 인정할 최소 변화
+    patience=5,        # 3 epoch 동안 개선 없으면 감소
+    threshold=0.01,    # 개선으로 인정할 최소 변화
     min_lr=1e-6        # lr이 너무 낮아지는 것 방지
 )
 
@@ -136,7 +136,7 @@ def validate(model, dataloader):
                 raw_predictions, attentions = model(x, lx, y=None)
 
             # Greedy Decoding
-            greedy_predictions   = torch.argmax(raw_predictions, dim = -1) # TODO: How do you get the most likely character from each distribution in the batch?
+            greedy_predictions   = torch.argmax(raw_predictions, dim = -1) # How do you get the most likely character from each distribution in the batch?
     
             # Levenshtein Distance 계산
             running_lev_dist    += calc_edit_distance(greedy_predictions, y, ly, VOCAB, print_example = False) # You can use print_example = True for one specific index i in your batches if you want

@@ -145,11 +145,12 @@ class Speller(torch.nn.Module):
     
 
     # 2. beam search 실행
-    def beam_search(self, encoder_output, encoder_len): 
-        raw_outputs = []        
-        attention_plot = []     
-        batch = encoder_output.size(0)
+    def beam_search(self, super_encoder_output, super_encoder_len): 
+        
+        # test.py에 보면 encoder_output과 encoder_len은 이미 슈퍼배치가 되서 들어오고 있음.
         topk = config["top_k"]
+        batch = super_encoder_output.size(0) // topk
+        
         vocab_size = len(VOCAB_MAP) 
 
         # 1. 배치와 빔을 합쳐서 슈퍼 배치를 만듦. 즉 0차원의 크기를 batch*topk
@@ -158,10 +159,6 @@ class Speller(torch.nn.Module):
             ## - repeat() -> [A, B, A, B, A, B] = 통째로 반복
             ## - repeat() -> [A, A, A, B, B, B] = 제자리 반복
             ## 같은 배치 내의 데이터는 연속적으로 topk 개수 만큼 있어야 다루기 편하므로, repeat_interleave를 이용함.
-        
-        ## test.py에 보면 encoder_output과 encoder_len은 이미 슈퍼배치가 되서 들어오고 있음.
-        encoder_output = encoder_output  # (b*k, seq, dim)
-        encoder_len = encoder_len        # (b*k, )
 
         # 2. lstm_step 개수 만큼 hidden state list에 hidden state을 초기화
         hidden_states_list = [] 
@@ -203,7 +200,7 @@ class Speller(torch.nn.Module):
 
             # 4) 가장 마지막 layer의 hidden state를 이용해서 attention context 계산
             last_hidden = hidden_states_list[-1][0]     # 가장 마지막 층의 hidden_state
-            attn_context, attn_weights = self.attend.compute_context(last_hidden, encoder_len) 
+            attn_context, attn_weights = self.attend.compute_context(last_hidden, super_encoder_len) 
 
             # 5) CDN 층에 통과
             cdn_input = torch.cat((last_hidden, attn_context), dim = -1) 

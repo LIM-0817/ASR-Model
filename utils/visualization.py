@@ -1,7 +1,7 @@
 import torch
 from torchviz import make_dot
 from models import ASRModel
-from config import config, DEVICE
+from config import DEVICE
 
 model = ASRModel(batch_size=2, input_size=28, embed_dim=128, lstm_step=2).to(DEVICE)
 

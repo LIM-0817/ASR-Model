@@ -7,3 +7,4 @@
 - spec augmentation
 - attention padding masking
 - add one more layer of pblstm
+- add beam search fx

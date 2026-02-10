@@ -55,8 +55,8 @@ class ASRModel(torch.nn.Module):
         ## beam search: test(validation도 가능)에서 주로 사용
         elif self.decode_mode == 'beam':
             predictions = self.speller.beam_search(
-                encoder_output = encoder_outputs, 
-                encoder_len = encoder_len
+                super_encoder_output = encoder_outputs, 
+                super_encoder_len = encoder_len
             )
             return predictions, None
         

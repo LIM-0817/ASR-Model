@@ -23,6 +23,10 @@ tf_rate: 0.7
 tf_decay_factor_1: 0.99  # stage1(epoch 40이하, alignment 유도 지점)
 tf_decay_factor_2: 0.98 # stage2(epoch 40이상, 자립 단계)
 
+## test decode mode
+decode_mode: "beam"
+top_k: 3
+
 
 project_name: "add one more pblstm layer-resume"
-resume_training: true
+resume_training: false

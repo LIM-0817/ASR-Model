@@ -77,11 +77,13 @@ class Speller(torch.nn.Module):
         raw_outputs = []        # 결과로 나온 logit (vocab_size,)
         attention_plot = []     # attention weight plotting을 위해 모아 놓을 리스트
 
+        batch = encoder_output.size(0)
+
         # 1. attention context 초기화
-        attn_context = torch.zeros((self.batch_size, self.embed_dim), device = DEVICE)
+        attn_context = torch.zeros((batch, self.embed_dim), device = DEVICE)
         
         # 2. 맨처음 문자는 <sos>로 모두 채움.
-        output_symbol = torch.full((self.batch_size, 1), VOCAB_MAP['<sos>'], device=DEVICE)
+        output_symbol = torch.full((batch, 1), VOCAB_MAP['<sos>'], device=DEVICE)
 
         # 3. 각 seq의 timestep을 설정하기
         if y is None: # groundtruth가 없다면?
@@ -93,8 +95,8 @@ class Speller(torch.nn.Module):
         # 4. lstm_step 개수 만큼 hidden state list에 hidden state을 초기화
         hidden_states_list = [] # hidden_states_list 초기화: [(h1, c1), (h2, c2), ...]
         for i in range(self.lstm_step_count):
-            h1 = torch.zeros((self.batch_size, self.embed_dim), device=DEVICE)
-            c1 = torch.zeros((self.batch_size, self.embed_dim), device=DEVICE)
+            h1 = torch.zeros((batch, self.embed_dim), device=DEVICE)
+            c1 = torch.zeros((batch, self.embed_dim), device=DEVICE)
             hidden_states_list.append((h1, c1))
 
         

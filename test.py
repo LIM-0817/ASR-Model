@@ -52,11 +52,11 @@ def test(model, dataloader):
         x, lx = x.to(DEVICE), lx.to(DEVICE)
 
         with torch.inference_mode():
-            predictions, _ = model(x, lx, y = None)
+            output, _ = model(x, lx, y = None)
 
         # 2. Greedy Decoding
         if model.decode_mode == "greedy":
-            greedy_predictions = torch.argmax(predictions, dim = -1)
+            greedy_predictions = torch.argmax(output, dim = -1)
 
         ## Convert predictions to characters
             for pred in greedy_predictions:
@@ -65,7 +65,7 @@ def test(model, dataloader):
         # 1. beam search
         ## beam search는 변환없이 바로 indices_to_chars 적용
         if model.decode_mode == "beam":
-            for pred in greedy_predictions:
+            for pred in output:
                     predictions.append("".join(indices_to_chars(pred, VOCAB)))
 
         batch_bar.update()

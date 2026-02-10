@@ -12,6 +12,8 @@
 Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시작으로 다양한 기법으로 성능을 끌어올림.
 
 
+
+
 ## best model
 - kaggle 제출 화면
 - validation levenstein distance: **23.926**, loss: **0.6045**
@@ -20,27 +22,34 @@ Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시�
 <img width="1101" height="78" alt="Image" src="https://github.com/user-attachments/assets/d219963d-180a-444a-8c10-d4d12a2daede" />
 
 
+
+
 ## Key Improvements 
+
 
 ### 1. Architecture Enhancements
 - **PBLSTM (Pyramidal Bi-LSTM)**: 시간 차원을 압축하여 긴 시퀀스 학습 효율 증대
 - **Add one more layer of PBLSTM**: 인코더의 깊이를 늘려 음성 특징 추출 능력 강화
 - **Conv1d Stride Tuning**
 
+
 ### 2. Training Strategy
 - **Scaling Factor**: 그래디언트 소실폭발 방지
 - **Staged Teacher Forcing Ratio**: 2 staged teacher forcing decay를 이용
 - **Spec Augmentation**: Time Masking, Frequency Masking을 통한 데이터 증강
+
 
 ### 3. Inference & Attention
 - **Attention Padding Masking**
 - **Beam Search Implementation**: 단순 Greedy Decoding 대신 test시 beam search이용해 레벤슈타인 거리 감소
 
 
+
+
 ## Visualization & Analysis
 
-### 1. Attention Map Analysis
 
+### 1. Attention Map Analysis
 
 | Epoch 1 (Initial) | Epoch 150 (Converged) |
 | :---: | :---: |
@@ -48,25 +57,33 @@ Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시�
 | 학습 초기: 정렬이 형성되지 않음 | **학습 완료: 선명한 대각선(Diagonal) 형태의<br>Alignment가 형성됨을 확인** |
 
 
+
+
 ### 2. Training Log and(Wandb)
 **Best Model 훈련 로그**
 <img width="100%" alt="Best Model Log" src="https://github.com/user-attachments/assets/40c80e61-a906-4865-aa04-7c70f7a518f3" />
 
+
 <details>
-<summary><strong>📂 Click to see All Experiments History (Hyperparameter Tuning)</strong></summary>
+<summary><strong> 모든 run 확인하고 싶은 경우 클릭</strong></summary>
 <br>
-모든 run
+RUNS
 <br><br>
 <img width="100%" alt="All Run Log" src="https://github.com/user-attachments/assets/f80bc842-c170-480d-817a-67204283a658" />
 </details>
 
 
+
+
 ## Installation & Usage
+
 
 ### 1. Requirements
 ```bash
 pip install -r requirements.txt
 ```
+
+
 
 
 ### 2. dataset download
@@ -84,6 +101,8 @@ unzip -q ./data/attention-based-speech-recognition.zip -d ./data
 ```
 
 
+
+
 ### 3. Train
 config.yaml 파일에서 hyperparameter tuning 이후 학습을 진행(config.py는 건드리지 말기!)
 ```bash
@@ -91,10 +110,14 @@ python train.py
 ```
 
 
+
+
 ### 4. Test(Inference)
 ```bash
 python test.py
 ```
+
+
 
 
 ## Project Structure

@@ -11,18 +11,16 @@
 **Listen, Attend and Spell (LAS)** 아키텍처를 기반
 Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시작으로 다양한 기법으로 성능을 끌어올림.
 
-## Performance Improvement
 
-수십 번의 실험과 구조 개선을 통해 초기 모델 대비 성능을 크게 향상시켰습니다.
+## best model
+- kaggle 제출 화면
+- validation levenstein distance: **23.926**, loss: **0.6045**
+- test levenstein distance: **18.3597** (beam search로 인한 개선)
 
-| Decoding Strategy | Metric (Levenshtein Distance) | Improvement |
-| :--- | :---: | :--- |
-| **Baseline (Greedy)** | 23.xx | - |
-| **Final (Beam Search)** | **18.xx (Public) / 21.xx (Private)** | **▼ Performance Boost** |
+<img width="1101" height="78" alt="Image" src="https://github.com/user-attachments/assets/d219963d-180a-444a-8c10-d4d12a2daede" />
+
 
 ## Key Improvements 
-
-베이스라인 모델의 한계를 극복하기 위해 다음과 같은 기법들을 단계적으로 적용했습니다.
 
 ### 1. Architecture Enhancements
 - **PBLSTM (Pyramidal Bi-LSTM)**: 시간 차원을 압축하여 긴 시퀀스 학습 효율 증대
@@ -38,6 +36,7 @@ Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시�
 - **Attention Padding Masking**
 - **Beam Search Implementation**: 단순 Greedy Decoding 대신 test시 beam search이용해 레벤슈타인 거리 감소
 
+
 ## Visualization & Analysis
 
 ### 1. Attention Map Analysis
@@ -47,6 +46,7 @@ Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시�
 | :---: | :---: |
 | <img width="100%" src="https://github.com/user-attachments/assets/fe2a73ce-19a4-40ee-9003-cc01b9e38298" /> | <img width="100%" src="https://github.com/user-attachments/assets/ed7ccb1d-269b-4ecf-9b0e-e1976f29300c" /> |
 | 학습 초기: 정렬이 형성되지 않음 | **학습 완료: 선명한 대각선(Diagonal) 형태의<br>Alignment가 형성됨을 확인** |
+
 
 ### 2. Training Log and(Wandb)
 **Best Model 훈련 로그**
@@ -60,12 +60,14 @@ Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시�
 <img width="100%" alt="All Run Log" src="https://github.com/user-attachments/assets/f80bc842-c170-480d-817a-67204283a658" />
 </details>
 
+
 ## Installation & Usage
 
 ### 1. Requirements
 ```bash
 pip install -r requirements.txt
 ```
+
 
 ### 2. dataset download
 !! kaggle 계정에서 API 생성 후 .kaggle 폴더에 업로드 필요 !!
@@ -81,16 +83,19 @@ kaggle competitions download -c attention-based-speech-recognition -p ./data
 unzip -q ./data/attention-based-speech-recognition.zip -d ./data
 ```
 
+
 ### 3. Train
 config.yaml 파일에서 hyperparameter tuning 이후 학습을 진행(config.py는 건드리지 말기!)
 ```bash
 python train.py
 ```
 
+
 ### 4. Test(Inference)
 ```bash
 python test.py
 ```
+
 
 ## Project Structure
 ```

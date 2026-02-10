@@ -27,11 +27,11 @@ test_loader     = torch.utils.data.DataLoader(
     num_workers = config['num_workers'],
     pin_memory  = True,
     collate_fn  = test_dataset.collate_fn,
-    drop_last = False
+    drop_last   = False
 )
 
 # 1. model 정의(ASR model)
-model = ASRModel(batch_size = config['batch_size'], input_size = 28, embed_dim =128,  lstm_step = 2)
+model = ASRModel(listener_hidden_size=config["listener_hidden_size"], batch_size = config['batch_size'], input_size = 28, embed_dim =config["embed_dim"],  lstm_step = 2)
 model = model.to(DEVICE)
 
 def test(model, dataloader):

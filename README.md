@@ -56,7 +56,9 @@ Test Levenshtein Distance (Public): 18.3597 (Beam Search 적용 결과)
 | Epoch 1 (Initial) | Epoch 150 (Converged) |
 | :---: | :---: |
 | <img width="100%" src="https://github.com/user-attachments/assets/fe2a73ce-19a4-40ee-9003-cc01b9e38298" /> | <img width="100%" src="https://github.com/user-attachments/assets/ed7ccb1d-269b-4ecf-9b0e-e1976f29300c" /> |
-| 학습 초기: 정렬이 형성되지 않음 | **학습 완료: 선명한 대각선(Diagonal) 형태의<br>Alignment가 형성됨을 확인** |
+| 학습 초기: 정렬이 형성되지 않음 | **학습 완료: 약간 대각선(Diagonal) 형태의<br>Alignment가 형성** |
+
+**단**, LAS 기반의 구조에서는 완전히 attention자체에 의존하지 않으므로 대각선이 선명하게 생기기는 어려운 측면이 있음. 
 
 
 

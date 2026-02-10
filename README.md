@@ -1,13 +1,5 @@
 # End-to-End Automatic Speech Recognition (ASR) Model
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white"/>
-  <img src="https://img.shields.io/badge/PyTorch-1.13%2B-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white"/>
-  <img src="https://img.shields.io/badge/WandB-Experiment-orange?style=for-the-badge&logo=weightsandbiases&logoColor=black"/>
-</div>
-
-<br>
-
 **Listen, Attend and Spell (LAS)** 아키텍처를 기반
 Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시작으로 다양한 기법으로 성능을 끌어올림.
 

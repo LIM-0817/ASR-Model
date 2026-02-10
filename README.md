@@ -14,12 +14,14 @@ Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시�
 
 
 
-## best model
-- kaggle 제출 화면
-- validation levenstein distance: **23.926**, loss: **0.6045**
-- test levenstein distance: **18.3597** (beam search로 인한 개선)
+## Best model
+Validation Levenshtein Distance: 23.926
 
-<img width="1101" height="78" alt="Image" src="https://github.com/user-attachments/assets/d219963d-180a-444a-8c10-d4d12a2daede" />
+Validation Loss: 0.6045
+
+Test Levenshtein Distance (Public): 18.3597 (Beam Search 적용 결과)
+
+<div align="center"> <div style="border: 2px solid #e1e4e8; border-radius: 10px; padding: 10px; display: inline-block; background-color: #f6f8fa;"> <img width="1101" alt="Kaggle Submission Result" src="https://github.com/user-attachments/assets/d219963d-180a-444a-8c10-d4d12a2daede" /> </div> <p><b>▲ Kaggle 제출 및 스코어 확인 화면</b></p> </div>
 
 
 

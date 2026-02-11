@@ -1,8 +1,8 @@
-# End-to-End Automatic Speech Recognition (ASR) Model
+# End-to-End Automatic Speech Recognition (ASR) Model, from Scratch
 
-**Listen, Attend and Spell (LAS)** 기반
-Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌 HW4P2를 더 발전시킴
--https://www.kaggle.com/competitions/attention-based-speech-recognition
+**Listen, Attend and Spell (LAS)** 모델 참고, 처음부터 스스로 모델 구현
+- (Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌 HW4P2 참고)
+- https://www.kaggle.com/competitions/attention-based-speech-recognition
 
 
 

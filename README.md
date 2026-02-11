@@ -2,7 +2,7 @@
 
 **Listen, Attend and Spell (LAS)** 모델 참고, **처음부터 모든 구조 스스로 구현**
 
-본 프로젝트는 높은 수준의 이해 및 연습을 위해 Beam Search, pBLSTM, Dot-product Attention 등 핵심 모듈을 외부 라이브러리에 의존하지 않고 **직접 구현** **(From Scratch)**했습니다. 이를 통해 모델의 내부 연산 흐름을 정밀하게 제어하고 최적화할 수 있었습니다.
+본 프로젝트는 높은 수준의 이해 및 연습을 위해 Beam Search, pBLSTM, Dot-product Attention 등 **핵심 모듈을 외부 라이브러리에 의존하지 않고 직접 구현**(From Scratch)했습니다. 이를 통해 모델의 내부 연산 흐름을 정밀하게 제어하고 최적화할 수 있었습니다.
 
 - (Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌 HW4P2 참고)
 - https://www.kaggle.com/competitions/attention-based-speech-recognition

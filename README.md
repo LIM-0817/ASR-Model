@@ -4,7 +4,12 @@
 Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌 HW4P2를 더 발전시킴
 -https://www.kaggle.com/competitions/attention-based-speech-recognition
 
+
+
+
+
 ## Model Architecture
+```mermaid
 graph TD
     %% 1. Input Section
     subgraph Input_Stage [Input Stage]
@@ -52,6 +57,8 @@ graph TD
     style Attender fill:#e1f5fe,stroke:#01579b
     style Speller fill:#e8f5e9,stroke:#2e7d32
     style Final fill:#00c853,stroke:#333,stroke-width:4px
+```
+
 
 
 

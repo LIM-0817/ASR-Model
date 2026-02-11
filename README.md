@@ -56,10 +56,14 @@ graph TD
     style Listener fill:#fff4dd,stroke:#d4a017
     style Attender fill:#e1f5fe,stroke:#01579b
     style Speller fill:#e8f5e9,stroke:#2e7d32
-    style Final fill:#00c853,stroke:#333,stroke-width:4px
+    style Final fill:#00c853,stroke:#333,stroke-width:4p
 ```
+</div> <p><b>▲ Encoder-Attender-Decoder을 거치는 end-to-end 구조</b></p> </div>
 
 
+
+<img width="553" height="384" alt="Image" src="https://github.com/user-attachments/assets/a6533952-4463-4e01-abac-8837867e9b55" />
+</div> <p><b>▲ speller 내부 구조</b></p> </div>
 
 
 ## Best model

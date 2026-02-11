@@ -1,8 +1,57 @@
 # End-to-End Automatic Speech Recognition (ASR) Model
 
-**Listen, Attend and Spell (LAS)** 아키텍처를 기반
-Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌의 HW4P2 구조를 시작으로 다양한 기법으로 성능을 끌어올림.
+**Listen, Attend and Spell (LAS)** 기반
+Carnegie Mellon Univ. (CMU) 11-785 Deep Learning 강좌 HW4P2를 더 발전시킴
+-https://www.kaggle.com/competitions/attention-based-speech-recognition
 
+## Model Architecture
+graph TD
+    %% 1. Input Section
+    subgraph Input_Stage [Input Stage]
+        In[Speech / Mfcc] --> Mel[Mel-Spectrogram]
+    end
+
+    %% 2. Listener Section (pBLSTM 반영)
+    subgraph Listener [Listener: Encoder]
+        Mel --> Conv[Conv1d / Stride]
+        Conv --> pB1[pBLSTM Layer 1]
+        pB1 --> pB2[pBLSTM Layer 2]
+        pB2 --> pB3[pBLSTM Layer 3]
+        note1[Each pBLSTM reduces<br/>Time-resolution by 1/2]
+        pB1 -.-> note1
+    end
+
+    %% 3. Attender Section
+    subgraph Attender [Attender]
+        pB3 --> KeyValue[set_key_value:<br/>Generate Keys & Values]
+        KeyValue --> Compute[compute_context:<br/>Dot-product Attention]
+    end
+
+    %% 4. Speller Section
+    subgraph Speller [Speller: Decoder]
+        SOS[< sos >] --> LSTM[LSTM Cells]
+        LSTM --> Query[Generate Query Qk]
+        Query --> Compute
+        Compute --> Context[Attention Context Vector]
+        Context --> CDN[Character Distribution Network]
+    end
+
+    %% 5. Inference Strategy (Beam Search 반영)
+    subgraph Inference [Inference Strategy]
+        CDN --> Greedy[Greedy Search]
+        CDN --> Beam[Beam Search: Top-K Hypotheses]
+        style Beam fill:#f96,stroke:#333,stroke-width:2px
+    end
+
+    %% 6. Final Result
+    Beam --> Final[Final Result: 18.3 CER]
+    Greedy --> Base[Baseline: 23.9 CER]
+
+    %% Styling
+    style Listener fill:#fff4dd,stroke:#d4a017
+    style Attender fill:#e1f5fe,stroke:#01579b
+    style Speller fill:#e8f5e9,stroke:#2e7d32
+    style Final fill:#00c853,stroke:#333,stroke-width:4px
 
 
 

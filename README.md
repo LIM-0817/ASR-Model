@@ -61,6 +61,9 @@ graph TD
 </div> <p><b>▲ Encoder-Attender-Decoder을 거치는 end-to-end 구조</b></p> </div>
 
 
+<img width="412" height="161" alt="Image" src="https://github.com/user-attachments/assets/b0fe6a13-74c8-4860-bc53-02d88eba39af" />
+</div> <p><b>▲ Listener 내부 구조</b></p> </div>
+
 
 <img width="553" height="384" alt="Image" src="https://github.com/user-attachments/assets/a6533952-4463-4e01-abac-8837867e9b55" />
 </div> <p><b>▲ speller 내부 구조</b></p> </div>

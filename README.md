@@ -52,8 +52,8 @@ graph TD
     end
 
     %% 6. Final Result
-    Beam --> Final[Final Result: 18.3 CER]
-    Greedy --> Base[Baseline: 23.9 CER]
+    Beam --> Final[Final Result: 18.3 Levenshtein]
+    Greedy --> Base[Baseline: 23.9 Levenshtein]
 
     %% Styling
     style Listener fill:#fff4dd,stroke:#d4a017
